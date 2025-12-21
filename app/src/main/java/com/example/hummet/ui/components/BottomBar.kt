@@ -9,19 +9,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 
-sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
-    object Home : Screen("home", "Home", Icons.Default.Home)
-    object Interview : Screen("interview", "Interview", Icons.Default.QuestionAnswer)
-    object Coding : Screen("coding", "Coding", Icons.Default.Code)
+data class ScreenRoute(val route: String, val label: String, val icon: ImageVector)
+
+object NavigationRoutes {
+    val Home = ScreenRoute("home", "Home", Icons.Default.Home)
+    val Questions = ScreenRoute("questions", "Questions", Icons.Default.QuestionAnswer)
+    val Coding = ScreenRoute("coding", "Coding", Icons.Default.Code)
 }
+
 @Composable
 fun BottomBar(navController: NavController) {
     val items = listOf(
-        Screen.Home,
-        Screen.Interview,
-        Screen.Coding
+        NavigationRoutes.Home,
+        NavigationRoutes.Questions,
+        NavigationRoutes.Coding
     )
 
     NavigationBar {
@@ -35,7 +39,7 @@ fun BottomBar(navController: NavController) {
                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 onClick = {
                     navController.navigate(screen.route) {
-                        popUpTo(navController.graph.startDestinationId) {
+                        popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
                         launchSingleTop = true

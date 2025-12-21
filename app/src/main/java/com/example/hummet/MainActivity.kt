@@ -12,10 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.hummet.ui.components.BottomBar
-import com.example.hummet.ui.components.Screen
 import com.example.hummet.ui.screens.Homepage
-import com.example.hummet.ui.screens.Coding
-import com.example.hummet.ui.screens.Interview
+import com.example.hummet.ui.screens.CodingScreen
+import com.example.hummet.ui.screens.QuestionsScreen
 import com.example.hummet.ui.theme.HummetTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,17 +33,17 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.Home.route,
+                        startDestination = "home",
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        composable(Screen.Home.route) {
+                        composable("home") {
                             Homepage(
-                                onNavigateToCoding = { navController.navigate(Screen.Coding.route) },
-                                onNavigateToInterview = { navController.navigate(Screen.Interview.route) }
+                                onNavigateToCoding = { navController.navigate("coding") },
+                                onNavigateToQuestions = { navController.navigate("questions") }
                             )
                         }
-                        composable(Screen.Interview.route) { Interview() }
-                        composable(Screen.Coding.route) { Coding() }
+                        composable("questions") { QuestionsScreen() }
+                        composable("coding") { CodingScreen() }
                     }
                 }
             }
