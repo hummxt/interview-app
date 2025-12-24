@@ -1,11 +1,14 @@
 package com.example.hummet.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.QuestionAnswer
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,144 +16,218 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
-data class Question(
+
+data class TopicGroup(
     val id: Int,
-    val title: String,
+    val topicTitle: String,
+    val category: String,
     val difficulty: String,
-    val category: String
+    val questions: List<String>,
+    val accentColor: Color
 )
+
+val topicData = listOf(
+    TopicGroup(1, "React State Management", "Frontend", "Medium",
+        listOf("What is the difference between useState and useReducer?", "When should you use Context API over Redux?", "How do you lift state up in React?", "What are the limitations of local state?"),
+        Color(0xFFE8B9FF)),
+    TopicGroup(2, "Kotlin Coroutines", "Languages", "Hard",
+        listOf("What is a CoroutineScope?", "Explain the difference between Launch and Async", "How does 'suspend' work under the hood?", "What is a Dispatcher?"),
+        Color(0xFFFFB366)),
+    TopicGroup(3, "SQL Indexing", "Databases", "Medium",
+        listOf("What is a B-Tree index?", "Difference between Clustered and Non-Clustered indexes?", "When does an index slow down performance?", "How to use EXPLAIN to optimize queries?"),
+        Color(0xFFA2D2FF)),
+    TopicGroup(4, "Node.js Event Loop", "Backend", "Hard",
+        listOf("Explain the phases of the Event Loop", "What is setImmediate vs process.nextTick?", "How does Node handle non-blocking I/O?", "What is the role of Libuv?"),
+        Color(0xFFB9FBC0)),
+    TopicGroup(5, "Swift UI Basics", "Mobile", "Easy",
+        listOf("What is a View in SwiftUI?", "How do @State and @Binding differ?", "Explain the Body property", "How to create a List in SwiftUI?"),
+        Color(0xFFFFCFD2))
+)
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuestionsScreen() {
-    val sampleQuestions = listOf(
-        Question(1, "What is polymorphism in OOP?", "Easy", "Languages"),
-        Question(2, "Explain REST API principles", "Medium", "Backend"),
-        Question(3, "What is useState in React?", "Easy", "Frontend"),
-        Question(4, "Difference between SQL and NoSQL", "Medium", "Databases"),
-        Question(5, "What is Docker and why use it?", "Medium", "DevOps"),
-        Question(6, "Explain Android Activity Lifecycle", "Medium", "Mobile"),
-        Question(7, "What are closures in JavaScript?", "Medium", "Languages"),
-        Question(8, "Explain MVC architecture", "Easy", "Backend")
-    )
-
+fun QuestionsScreen(navController: NavController) {
+    var searchQuery by remember { mutableStateOf("") }
     var selectedDifficulty by remember { mutableStateOf("All") }
-    val difficulties = listOf("All", "Easy", "Medium", "Hard")
+    var selectedCategory by remember { mutableStateOf("All") }
 
-    val filteredQuestions = if (selectedDifficulty == "All") {
-        sampleQuestions
-    } else {
-        sampleQuestions.filter { it.difficulty == selectedDifficulty }
+    val filteredTopics = topicData.filter { topic ->
+        val matchesSearch = topic.topicTitle.contains(searchQuery, ignoreCase = true)
+        val matchesDiff = selectedDifficulty == "All" || topic.difficulty == selectedDifficulty
+        val matchesCat = selectedCategory == "All" || topic.category == selectedCategory
+        matchesSearch && matchesDiff && matchesCat
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Interview Questions",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+    Column(modifier = Modifier.fillMaxSize()) {
+        CenterAlignedTopAppBar(
+            title = {
+                Text("Topic Library", fontWeight = FontWeight.Black, fontSize = 22.sp)
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent
             )
-        }
-    ) { padding ->
-        Column(
+        )
+
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
             modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            placeholder = { Text("Search topics...", fontSize = 14.sp) },
+            leadingIcon = { Icon(Icons.Default.Search, null) },
+            shape = RoundedCornerShape(16.dp),
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.LightGray.copy(alpha = 0.3f),
+                focusedBorderColor = Color.Black
+            )
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text("Difficulty",
+            modifier = Modifier.padding(horizontal = 16.dp),
+            style = MaterialTheme.typography.labelLarge,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                difficulties.forEach { difficulty ->
+            listOf("All", "Easy", "Medium", "Hard").forEach { diff ->
+                FilterChip(
+                    modifier = Modifier.weight(1f).height(40.dp),
+                    selected = selectedDifficulty == diff,
+                    onClick = { selectedDifficulty = diff },
+                    label = { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Text(diff, fontSize = 11.sp, fontWeight = FontWeight.Bold) } },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Black, selectedLabelColor = Color.White)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text("Categories",
+            modifier = Modifier.padding(horizontal = 16.dp),
+            style = MaterialTheme.typography.labelLarge,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        val categories = listOf("All", "Languages", "Backend", "Frontend", "Databases", "Mobile")
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                categories.take(3).forEach { cat ->
                     FilterChip(
-                        selected = selectedDifficulty == difficulty,
-                        onClick = { selectedDifficulty = difficulty },
-                        label = { Text(difficulty) },
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.weight(1f).height(40.dp),
+                        selected = selectedCategory == cat,
+                        onClick = { selectedCategory = cat },
+                        label = { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Text(cat, fontSize = 11.sp, fontWeight = FontWeight.Bold) } },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Black, selectedLabelColor = Color.White)
                     )
                 }
             }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                categories.takeLast(3).forEach { cat ->
+                    FilterChip(
+                        modifier = Modifier.weight(1f).height(40.dp),
+                        selected = selectedCategory == cat,
+                        onClick = { selectedCategory = cat },
+                        label = { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Text(cat, fontSize = 11.sp, fontWeight = FontWeight.Bold) } },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Black, selectedLabelColor = Color.White)
+                    )
+                }
+            }
+        }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(filteredQuestions) { question ->
-                    QuestionCard(question = question)
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = "Topics",
+            modifier = Modifier.padding(horizontal = 16.dp),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        LazyColumn(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
+            itemsIndexed(filteredTopics) { index, topic ->
+                TopicListItem(topic = topic, onClick = { navController.navigate("quiz/${topic.id}") })
+                if (index < filteredTopics.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 72.dp, end = 16.dp),
+                        thickness = 0.5.dp,
+                        color = Color.LightGray.copy(alpha = 0.3f)
+                    )
                 }
             }
         }
     }
 }
 
+
 @Composable
-fun QuestionCard(question: Question) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = when (question.difficulty) {
-                "Easy" -> Color(0xFFE8F5E9)
-                "Medium" -> Color(0xFFFFF3E0)
-                "Hard" -> Color(0xFFFFEBEE)
-                else -> MaterialTheme.colorScheme.surface
-            }
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Outlined.QuestionAnswer,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = when (question.difficulty) {
-                        "Easy" -> Color(0xFF4CAF50)
-                        "Medium" -> Color(0xFFFF9800)
-                        "Hard" -> Color(0xFFF44336)
-                        else -> Color.Gray
-                    }
-                ) {
-                    Text(
-                        text = question.difficulty,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        color = Color.White,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
+fun TopicListItem(topic: TopicGroup, onClick: () -> Unit) {
+    ListItem(
+        modifier = Modifier.clickable { onClick() },
+        colors = ListItemDefaults.colors(
+            containerColor = Color.Transparent
+        ),
+        headlineContent = {
             Text(
-                text = question.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+                topic.topicTitle,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyLarge
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
+        },
+        supportingContent = {
             Text(
-                text = question.category,
+                "${topic.questions.size} Questions • ${topic.difficulty}",
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
+        },
+        leadingContent = {
+            Surface(
+                color = topic.accentColor.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(48.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Outlined.Quiz,
+                        contentDescription = null,
+                        tint = topic.accentColor,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+        },
+        trailingContent = {
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = Color.LightGray
+            )
         }
-    }
+    )
 }
