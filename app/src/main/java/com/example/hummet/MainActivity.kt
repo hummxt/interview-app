@@ -16,10 +16,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.hummet.ui.components.BottomBar
-import com.example.hummet.ui.screens.Homepage
+import com.example.hummet.ui.screens.home.Homepage
 import com.example.hummet.ui.screens.CodingScreen
-import com.example.hummet.ui.screens.QuestionsScreen
-import com.example.hummet.ui.screens.QuizScreen
+import com.example.hummet.ui.screens.quiz.QuizScreen
 import com.example.hummet.ui.theme.HummetTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +34,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        if (currentRoute == "home" || currentRoute == "questions" || currentRoute == "coding") {
+                        if (currentRoute == "home" || currentRoute == "quiz" || currentRoute == "coding") {
                             BottomBar(navController = navController)
                         }
                     }
@@ -48,11 +47,12 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             Homepage(
                                 onNavigateToCoding = { navController.navigate("coding") },
-                                onNavigateToQuestions = { navController.navigate("questions") }
+                                // This will now work because we updated Homepage.kt
+                                onNavigateToQuiz = { navController.navigate("quiz") }
                             )
                         }
-                        composable("questions") {
-                            QuestionsScreen(navController = navController)
+                        composable("quiz") {
+                            QuizScreen(navController = navController)
                         }
                         composable("coding") {
                             CodingScreen()

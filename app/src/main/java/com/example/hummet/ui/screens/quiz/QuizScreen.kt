@@ -1,4 +1,4 @@
-package com.example.hummet.ui.screens
+package com.example.hummet.ui.screens.quiz
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
 
 data class TopicGroup(
     val id: Int,
@@ -47,10 +46,9 @@ val topicData = listOf(
         Color(0xFFFFCFD2))
 )
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuestionsScreen(navController: NavController) {
+fun QuizScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedDifficulty by remember { mutableStateOf("All") }
     var selectedCategory by remember { mutableStateOf("All") }
@@ -184,6 +182,17 @@ fun QuestionsScreen(navController: NavController) {
     }
 }
 
+@Composable
+fun QuizScreen(topicId: Int, onBack: () -> Unit) {
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Box(contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Quiz Details for Topic $topicId")
+                Button(onClick = onBack) { Text("Go Back") }
+            }
+        }
+    }
+}
 
 @Composable
 fun TopicListItem(topic: TopicGroup, onClick: () -> Unit) {

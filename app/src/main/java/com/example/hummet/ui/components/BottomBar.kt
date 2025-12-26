@@ -16,7 +16,7 @@ data class ScreenRoute(val route: String, val label: String, val icon: ImageVect
 
 object NavigationRoutes {
     val Home = ScreenRoute("home", "Home", Icons.Default.Home)
-    val Questions = ScreenRoute("questions", "Questions", Icons.Default.QuestionAnswer)
+    val Quiz = ScreenRoute("quiz", "Quiz", Icons.Default.QuestionAnswer)
     val Coding = ScreenRoute("coding", "Coding", Icons.Default.Code)
 }
 
@@ -24,7 +24,7 @@ object NavigationRoutes {
 fun BottomBar(navController: NavController) {
     val items = listOf(
         NavigationRoutes.Home,
-        NavigationRoutes.Questions,
+        NavigationRoutes.Quiz,
         NavigationRoutes.Coding
     )
 
