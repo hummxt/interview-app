@@ -58,12 +58,12 @@ fun ProfileScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Alex Hummet", // Name
+                    text = "Hummet",
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Gold Member", // Rank/Status
+                    text = "Member",
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Medium
                 )
