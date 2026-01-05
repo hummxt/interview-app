@@ -17,7 +17,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -105,35 +104,40 @@ fun InterviewScreen() {
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
-        topBar = {
-            TopAppBar(
-                title = {
+        containerColor = MaterialTheme.colorScheme.surface
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(
+                top = padding.calculateTopPadding() + 16.dp,
+                bottom = padding.calculateBottomPadding() + 24.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        "Interview Prep",
-                        style = MaterialTheme.typography.headlineSmall,
+                        text = "Interview Prep",
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = primaryTextColor
                     )
-                },
-                actions = {
                     IconButton(onClick = { showStats = !showStats }) {
                         Icon(
-                            if (showStats) Icons.Outlined.GridView else Icons.Outlined.BarChart,
-                            contentDescription = null,
+                            imageVector = if (showStats) Icons.Outlined.GridView else Icons.Outlined.BarChart,
+                            contentDescription = "Toggle Stats",
                             tint = primaryTextColor
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
-            )
-        }
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+                }
+            }
+
             item {
                 AnimatedVisibility(visible = showStats) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -179,7 +183,7 @@ fun InterviewScreen() {
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search interview topics...", color = secondaryTextColor, fontSize = 14.sp) },
+                    placeholder = { Text("Search topics...", color = secondaryTextColor, fontSize = 14.sp) },
                     leadingIcon = { Icon(Icons.Default.Search, null, tint = primaryTextColor, modifier = Modifier.size(20.dp)) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
@@ -196,8 +200,7 @@ fun InterviewScreen() {
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent,
                         focusedTextColor = primaryTextColor,
-                        unfocusedTextColor = primaryTextColor,
-                        cursorColor = primaryTextColor
+                        unfocusedTextColor = primaryTextColor
                     )
                 )
             }
@@ -265,24 +268,17 @@ fun InterviewScreen() {
 }
 
 @Composable
-fun StatsGrid(
-    primaryTextColor: Color,
-    secondaryTextColor: Color,
-    containerColor: Color
-) {
+fun StatsGrid(primaryTextColor: Color, secondaryTextColor: Color, containerColor: Color) {
     val stats = listOf(
-        StatItem("Topics Completed", "12", Icons.Outlined.CheckCircle, Color(0xFF10B981)),
-        StatItem("Hours Practiced", "18.5", Icons.Outlined.Schedule, Color(0xFF3B82F6)),
-        StatItem("Success Rate", "87%", Icons.Outlined.TrendingUp, Color(0xFFF59E0B)),
-        StatItem("Current Streak", "7 days", Icons.Outlined.LocalFireDepartment, Color(0xFFEF4444))
+        StatItem("Topics Completed", "0", Icons.Outlined.CheckCircle, Color(0xFF10B981)),
+        StatItem("Hours Practiced", "0", Icons.Outlined.Schedule, Color(0xFF3B82F6)),
+        StatItem("Success Rate", "0%", Icons.Outlined.TrendingUp, Color(0xFFF59E0B)),
+        StatItem("Current Streak", "0 days", Icons.Outlined.LocalFireDepartment, Color(0xFFEF4444))
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         stats.chunked(2).forEach { rowStats ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 rowStats.forEach { stat ->
                     Card(
                         modifier = Modifier.weight(1f),
@@ -301,19 +297,8 @@ fun StatsGrid(
                                 Icon(stat.icon, null, tint = stat.color, modifier = Modifier.size(18.dp))
                             }
                             Column {
-                                Text(
-                                    stat.value,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp,
-                                    color = primaryTextColor
-                                )
-                                Text(
-                                    stat.label,
-                                    fontSize = 11.sp,
-                                    color = secondaryTextColor,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
+                                Text(stat.value, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = primaryTextColor)
+                                Text(stat.label, fontSize = 11.sp, color = secondaryTextColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                         }
                     }
@@ -324,60 +309,28 @@ fun StatsGrid(
 }
 
 @Composable
-fun ProgressOverviewCard(
-    dailyCardColor: Color,
-    dailyCardTextColor: Color,
-    accentButtonColor: Color,
-    accentButtonTextColor: Color
-) {
+fun ProgressOverviewCard(dailyCardColor: Color, dailyCardTextColor: Color, accentButtonColor: Color, accentButtonTextColor: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = dailyCardColor)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        "Keep Going Strong!",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = dailyCardTextColor
-                    )
+                    Text("Keep Going Strong!", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = dailyCardTextColor)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        "You're 35% through this month's goals",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = dailyCardTextColor.copy(alpha = 0.85f),
-                        lineHeight = 20.sp
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        "3 topics mastered this week",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = dailyCardTextColor.copy(alpha = 0.7f),
-                        fontSize = 13.sp
-                    )
+                    Text("You're 0% through this month's goals", style = MaterialTheme.typography.bodyMedium, color = dailyCardTextColor.copy(alpha = 0.85f))
                 }
-                Spacer(modifier = Modifier.width(12.dp))
                 Box(contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
-                        progress = { 0.35f },
+                        progress = { 0.0f },
                         modifier = Modifier.size(56.dp),
                         color = dailyCardTextColor,
                         strokeWidth = 5.dp,
                         trackColor = dailyCardTextColor.copy(0.2f)
                     )
-                    Text(
-                        "35%",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = dailyCardTextColor
-                    )
+                    Text("0%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = dailyCardTextColor)
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -385,10 +338,7 @@ fun ProgressOverviewCard(
                 Button(
                     onClick = { },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = accentButtonColor,
-                        contentColor = accentButtonTextColor
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = accentButtonColor, contentColor = accentButtonTextColor),
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Icon(Icons.Outlined.PlayArrow, null, modifier = Modifier.size(18.dp))
@@ -397,13 +347,7 @@ fun ProgressOverviewCard(
                 }
                 OutlinedButton(
                     onClick = { },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = dailyCardTextColor
-                    ),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(
-                        width = 1.5.dp,
-                        brush = Brush.linearGradient(listOf(dailyCardTextColor.copy(0.3f), dailyCardTextColor.copy(0.3f)))
-                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = dailyCardTextColor),
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Icon(Icons.Outlined.Insights, null, modifier = Modifier.size(18.dp))
@@ -414,115 +358,44 @@ fun ProgressOverviewCard(
 }
 
 @Composable
-fun StreakCard(
-    modifier: Modifier = Modifier,
-    cardColor: Color,
-    textColor: Color
-) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                Icons.Outlined.LocalFireDepartment,
-                null,
-                tint = textColor,
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                "7 Days",
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = textColor
-            )
-            Text(
-                "Current Streak",
-                fontSize = 12.sp,
-                color = textColor.copy(alpha = 0.8f)
-            )
+fun StreakCard(modifier: Modifier = Modifier, cardColor: Color, textColor: Color) {
+    Card(modifier = modifier, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = cardColor)) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Icon(Icons.Outlined.LocalFireDepartment, null, tint = textColor, modifier = Modifier.size(24.dp))
+            Text("7 Days", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = textColor)
+            Text("Current Streak", fontSize = 12.sp, color = textColor.copy(alpha = 0.8f))
         }
     }
 }
 
 @Composable
-fun AchievementCard(
-    modifier: Modifier = Modifier,
-    cardColor: Color,
-    textColor: Color
-) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                Icons.Outlined.EmojiEvents,
-                null,
-                tint = textColor,
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                "12 / 50",
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = textColor
-            )
-            Text(
-                "Topics Mastered",
-                fontSize = 12.sp,
-                color = textColor.copy(alpha = 0.8f)
-            )
+fun AchievementCard(modifier: Modifier = Modifier, cardColor: Color, textColor: Color) {
+    Card(modifier = modifier, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = cardColor)) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Icon(Icons.Outlined.EmojiEvents, null, tint = textColor, modifier = Modifier.size(24.dp))
+            Text("12 / 50", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = textColor)
+            Text("Topics Mastered", fontSize = 12.sp, color = textColor.copy(alpha = 0.8f))
         }
     }
 }
 
 @Composable
-fun CategoryFilterRow(
-    selectedCategory: Category?,
-    accentColor: Color,
-    accentTextColor: Color,
-    containerColor: Color,
-    textColor: Color,
-    onCategorySelected: (Category) -> Unit
-) {
+fun CategoryFilterRow(selectedCategory: Category?, accentColor: Color, accentTextColor: Color, containerColor: Color, textColor: Color, onCategorySelected: (Category) -> Unit) {
     Column {
-        Text(
-            "Categories",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            color = textColor,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+        Text("Categories", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = textColor, modifier = Modifier.padding(bottom = 8.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(Category.entries) { category ->
                 FilterChip(
                     selected = selectedCategory == category,
                     onClick = { onCategorySelected(category) },
                     label = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(category.icon, null, modifier = Modifier.size(14.dp))
                             Text(category.label, fontSize = 12.sp)
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = accentColor,
-                        selectedLabelColor = accentTextColor,
-                        containerColor = containerColor,
-                        labelColor = textColor
-                    ),
+                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = accentColor, selectedLabelColor = accentTextColor, containerColor = containerColor, labelColor = textColor),
                     border = null
                 )
             }
@@ -531,60 +404,24 @@ fun CategoryFilterRow(
 }
 
 @Composable
-fun DifficultyFilterRow(
-    selectedDifficulty: DifficultyLevel?,
-    accentColor: Color,
-    accentTextColor: Color,
-    containerColor: Color,
-    textColor: Color,
-    onDifficultySelected: (DifficultyLevel) -> Unit
-) {
+fun DifficultyFilterRow(selectedDifficulty: DifficultyLevel?, accentColor: Color, accentTextColor: Color, containerColor: Color, textColor: Color, onDifficultySelected: (DifficultyLevel) -> Unit) {
     Column {
-        Text(
-            "Difficulty Level",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            color = textColor,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Text("Difficulty Level", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = textColor, modifier = Modifier.padding(bottom = 8.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             DifficultyLevel.entries.forEach { difficulty ->
                 FilterChip(
                     modifier = Modifier.weight(1f),
                     selected = selectedDifficulty == difficulty,
                     onClick = { onDifficultySelected(difficulty) },
                     label = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .background(
-                                        if (selectedDifficulty == difficulty) accentTextColor else difficulty.color,
-                                        CircleShape
-                                    )
-                            )
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(8.dp).background(if (selectedDifficulty == difficulty) accentTextColor else difficulty.color, CircleShape))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                difficulty.label,
-                                textAlign = TextAlign.Center,
-                                fontSize = 12.sp
-                            )
+                            Text(difficulty.label, textAlign = TextAlign.Center, fontSize = 12.sp)
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = accentColor,
-                        selectedLabelColor = accentTextColor,
-                        containerColor = containerColor,
-                        labelColor = textColor
-                    ),
+                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = accentColor, selectedLabelColor = accentTextColor, containerColor = containerColor, labelColor = textColor),
                     border = null
                 )
             }
@@ -593,109 +430,35 @@ fun DifficultyFilterRow(
 }
 
 @Composable
-fun TopicCard(
-    topic: InterviewTopic,
-    primaryTextColor: Color,
-    secondaryTextColor: Color,
-    containerColor: Color,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor)
-    ) {
+fun TopicCard(topic: InterviewTopic, primaryTextColor: Color, secondaryTextColor: Color, containerColor: Color, onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .background(
-                                Brush.linearGradient(topic.category.gradient),
-                                RoundedCornerShape(12.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            topic.category.icon,
-                            null,
-                            tint = Color.White,
-                            modifier = Modifier.size(22.dp)
-                        )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(44.dp).background(Brush.linearGradient(topic.category.gradient), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+                        Icon(topic.category.icon, null, tint = Color.White, modifier = Modifier.size(22.dp))
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            topic.title,
-                            fontWeight = FontWeight.Bold,
-                            color = primaryTextColor,
-                            fontSize = 16.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            "${topic.questionsCount} Questions • ${topic.estimatedTime}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = secondaryTextColor
-                        )
+                        Text(topic.title, fontWeight = FontWeight.Bold, color = primaryTextColor, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text("${topic.questionsCount} Questions • ${topic.estimatedTime}", style = MaterialTheme.typography.bodySmall, color = secondaryTextColor)
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .background(topic.difficulty.color.copy(0.15f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .background(topic.difficulty.color, CircleShape)
-                    )
+                Box(modifier = Modifier.size(28.dp).background(topic.difficulty.color.copy(0.15f), CircleShape), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.size(10.dp).background(topic.difficulty.color, CircleShape))
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                topic.description,
-                color = secondaryTextColor,
-                fontSize = 14.sp,
-                maxLines = 2,
-                lineHeight = 20.sp
-            )
+            Text(topic.description, color = secondaryTextColor, fontSize = 14.sp, maxLines = 2, lineHeight = 20.sp)
         }
     }
 }
 
 @Composable
 fun EmptyState(textColor: Color) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(60.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Icon(
-            Icons.Outlined.SearchOff,
-            null,
-            tint = textColor.copy(alpha = 0.5f),
-            modifier = Modifier.size(48.dp)
-        )
-        Text(
-            "No topics found",
-            color = textColor,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp
-        )
-        Text(
-            "Try adjusting your filters",
-            color = textColor.copy(alpha = 0.7f),
-            fontSize = 13.sp
-        )
+    Column(modifier = Modifier.fillMaxWidth().padding(60.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(Icons.Outlined.SearchOff, null, tint = textColor.copy(alpha = 0.5f), modifier = Modifier.size(48.dp))
+        Text("No topics found", color = textColor, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+        Text("Try adjusting your filters", color = textColor.copy(alpha = 0.7f), fontSize = 13.sp)
     }
 }

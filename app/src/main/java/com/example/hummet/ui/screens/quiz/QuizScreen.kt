@@ -1,12 +1,15 @@
 package com.example.hummet.ui.screens.quiz
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material3.*
@@ -53,6 +56,13 @@ fun QuizScreen(navController: NavController) {
     var selectedDifficulty by remember { mutableStateOf("All") }
     var selectedCategory by remember { mutableStateOf("All") }
 
+    val isDark = isSystemInDarkTheme()
+    val primaryTextColor = if (isDark) Color.White else Color.Black
+    val secondaryTextColor = if (isDark) Color.LightGray else Color.Gray
+    val containerColor = if (isDark) Color(0xFF1E1E1E) else Color(0xFFF0F0F0)
+    val accentColor = if (isDark) Color.White else Color.Black
+    val accentTextColor = if (isDark) Color.Black else Color.White
+
     val filteredTopics = topicData.filter { topic ->
         val matchesSearch = topic.topicTitle.contains(searchQuery, ignoreCase = true)
         val matchesDiff = selectedDifficulty == "All" || topic.difficulty == selectedDifficulty
@@ -60,121 +70,172 @@ fun QuizScreen(navController: NavController) {
         matchesSearch && matchesDiff && matchesCat
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        CenterAlignedTopAppBar(
-            title = {
-                Text("Topic Library", fontWeight = FontWeight.Black, fontSize = 22.sp)
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color.Transparent
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                top = padding.calculateTopPadding() + 16.dp,
+                bottom = padding.calculateBottomPadding() + 24.dp
             )
-        )
-
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            placeholder = { Text("Search topics...", fontSize = 14.sp) },
-            leadingIcon = { Icon(Icons.Default.Search, null) },
-            shape = RoundedCornerShape(16.dp),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color.LightGray.copy(alpha = 0.3f),
-                focusedBorderColor = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text("Difficulty",
-            modifier = Modifier.padding(horizontal = 16.dp),
-            style = MaterialTheme.typography.labelLarge,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            listOf("All", "Easy", "Medium", "Hard").forEach { diff ->
-                FilterChip(
-                    modifier = Modifier.weight(1f).height(40.dp),
-                    selected = selectedDifficulty == diff,
-                    onClick = { selectedDifficulty = diff },
-                    label = { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Text(diff, fontSize = 11.sp, fontWeight = FontWeight.Bold) } },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Black, selectedLabelColor = Color.White)
+            item {
+                Text(
+                    text = "Topic Library",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = primaryTextColor,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 24.dp)
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Categories",
-            modifier = Modifier.padding(horizontal = 16.dp),
-            style = MaterialTheme.typography.labelLarge,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        val categories = listOf("All", "Languages", "Backend", "Frontend", "Databases", "Mobile")
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-        ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                categories.take(3).forEach { cat ->
-                    FilterChip(
-                        modifier = Modifier.weight(1f).height(40.dp),
-                        selected = selectedCategory == cat,
-                        onClick = { selectedCategory = cat },
-                        label = { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Text(cat, fontSize = 11.sp, fontWeight = FontWeight.Bold) } },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Black, selectedLabelColor = Color.White)
+            item {
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Search topics...", color = secondaryTextColor, fontSize = 14.sp) },
+                        leadingIcon = { Icon(Icons.Default.Search, null, tint = primaryTextColor, modifier = Modifier.size(20.dp)) },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Default.Close, null, tint = secondaryTextColor, modifier = Modifier.size(18.dp))
+                                }
+                            }
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = containerColor,
+                            unfocusedContainerColor = containerColor,
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedTextColor = primaryTextColor,
+                            unfocusedTextColor = primaryTextColor
+                        )
                     )
                 }
+                Spacer(modifier = Modifier.height(24.dp))
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                categories.takeLast(3).forEach { cat ->
-                    FilterChip(
-                        modifier = Modifier.weight(1f).height(40.dp),
-                        selected = selectedCategory == cat,
-                        onClick = { selectedCategory = cat },
-                        label = { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Text(cat, fontSize = 11.sp, fontWeight = FontWeight.Bold) } },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Black, selectedLabelColor = Color.White)
-                    )
+
+            item {
+                Text(
+                    "Difficulty",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = primaryTextColor,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf("All", "Easy", "Medium", "Hard").forEach { diff ->
+                        FilterChip(
+                            modifier = Modifier.weight(1f).height(40.dp),
+                            selected = selectedDifficulty == diff,
+                            onClick = { selectedDifficulty = diff },
+                            label = {
+                                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                    Text(diff, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                }
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = accentColor,
+                                selectedLabelColor = accentTextColor,
+                                containerColor = containerColor,
+                                labelColor = primaryTextColor
+                            ),
+                            border = null
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.height(16.dp))
             }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            item {
+                Text(
+                    "Categories",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = primaryTextColor,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                )
+                val categories = listOf("All", "Languages", "Backend", "Frontend", "Databases", "Mobile")
+                Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        categories.take(3).forEach { cat ->
+                            FilterChip(
+                                modifier = Modifier.weight(1f).height(40.dp),
+                                selected = selectedCategory == cat,
+                                onClick = { selectedCategory = cat },
+                                label = {
+                                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                        Text(cat, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = accentColor,
+                                    selectedLabelColor = accentTextColor,
+                                    containerColor = containerColor,
+                                    labelColor = primaryTextColor
+                                ),
+                                border = null
+                            )
+                        }
+                    }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        categories.takeLast(3).forEach { cat ->
+                            FilterChip(
+                                modifier = Modifier.weight(1f).height(40.dp),
+                                selected = selectedCategory == cat,
+                                onClick = { selectedCategory = cat },
+                                label = {
+                                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                        Text(cat, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = accentColor,
+                                    selectedLabelColor = accentTextColor,
+                                    containerColor = containerColor,
+                                    labelColor = primaryTextColor
+                                ),
+                                border = null
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
-        Text(
-            text = "Topics",
-            modifier = Modifier.padding(horizontal = 16.dp),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
+            item {
+                Text(
+                    text = "Topics",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = primaryTextColor,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                )
+            }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            modifier = Modifier.weight(1f).fillMaxWidth(),
-            contentPadding = PaddingValues(bottom = 16.dp)
-        ) {
             itemsIndexed(filteredTopics) { index, topic ->
-                TopicListItem(topic = topic, onClick = { navController.navigate("quiz/${topic.id}") })
+                TopicListItem(
+                    topic = topic,
+                    primaryTextColor = primaryTextColor,
+                    secondaryTextColor = secondaryTextColor,
+                    onClick = { navController.navigate("quiz/${topic.id}") }
+                )
                 if (index < filteredTopics.lastIndex) {
                     HorizontalDivider(
                         modifier = Modifier.padding(start = 72.dp, end = 16.dp),
                         thickness = 0.5.dp,
-                        color = Color.LightGray.copy(alpha = 0.3f)
+                        color = secondaryTextColor.copy(alpha = 0.2f)
                     )
                 }
             }
@@ -183,28 +244,15 @@ fun QuizScreen(navController: NavController) {
 }
 
 @Composable
-fun QuizScreen(topicId: Int, onBack: () -> Unit) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Box(contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Quiz Details for Topic $topicId")
-                Button(onClick = onBack) { Text("Go Back") }
-            }
-        }
-    }
-}
-
-@Composable
-fun TopicListItem(topic: TopicGroup, onClick: () -> Unit) {
+fun TopicListItem(topic: TopicGroup, primaryTextColor: Color, secondaryTextColor: Color, onClick: () -> Unit) {
     ListItem(
         modifier = Modifier.clickable { onClick() },
-        colors = ListItemDefaults.colors(
-            containerColor = Color.Transparent
-        ),
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         headlineContent = {
             Text(
                 topic.topicTitle,
                 fontWeight = FontWeight.Bold,
+                color = primaryTextColor,
                 style = MaterialTheme.typography.bodyLarge
             )
         },
@@ -212,12 +260,12 @@ fun TopicListItem(topic: TopicGroup, onClick: () -> Unit) {
             Text(
                 "${topic.questions.size} Questions • ${topic.difficulty}",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                color = secondaryTextColor
             )
         },
         leadingContent = {
             Surface(
-                color = topic.accentColor.copy(alpha = 0.3f),
+                color = topic.accentColor.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.size(48.dp)
             ) {
@@ -235,7 +283,7 @@ fun TopicListItem(topic: TopicGroup, onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
-                tint = Color.LightGray
+                tint = secondaryTextColor.copy(alpha = 0.5f)
             )
         }
     )

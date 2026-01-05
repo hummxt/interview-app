@@ -2,9 +2,8 @@ package com.example.hummet.ui.screens.home
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Code
@@ -80,146 +79,163 @@ fun Homepage(
     }
 
     Scaffold(
-        topBar = {
-            Column(modifier = Modifier.statusBarsPadding()) {
-                ProfileSection(
-                    primaryTextColor = primaryTextColor,
-                    secondaryTextColor = secondaryTextColor
-                )
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = { searchQuery = it },
-                    onSearch = { isSearchActive = false },
-                    active = isSearchActive,
-                    onActiveChange = { isSearchActive = it },
-                    placeholder = { Text("Search interview topics...", fontSize = 14.sp, color = secondaryTextColor) },
-                    leadingIcon = { Icon(Icons.Default.Search, null, modifier = Modifier.size(20.dp), tint = primaryTextColor) },
+        containerColor = MaterialTheme.colorScheme.surface
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentPadding = PaddingValues(
+                top = innerPadding.calculateTopPadding(),
+                bottom = innerPadding.calculateBottomPadding() + 16.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(top = 16.dp)
+                ) {
+                    ProfileSection(
+                        primaryTextColor = primaryTextColor,
+                        secondaryTextColor = secondaryTextColor
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    SearchBar(
+                        query = searchQuery,
+                        onQueryChange = { searchQuery = it },
+                        onSearch = { isSearchActive = false },
+                        active = isSearchActive,
+                        onActiveChange = { isSearchActive = it },
+                        placeholder = { Text("Search interview topics...", fontSize = 14.sp, color = secondaryTextColor) },
+                        leadingIcon = { Icon(Icons.Default.Search, null, modifier = Modifier.size(20.dp), tint = primaryTextColor) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .heightIn(max = 56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = SearchBarDefaults.colors(
+                            containerColor = searchContainerColor,
+                            inputFieldColors = TextFieldDefaults.colors(
+                                focusedTextColor = primaryTextColor,
+                                unfocusedTextColor = primaryTextColor,
+                                cursorColor = primaryTextColor,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent
+                            )
+                        )
+                    ) {}
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    colors = CardDefaults.cardColors(containerColor = dailyCardColor),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Icon(Icons.Outlined.Terminal, null, modifier = Modifier.size(28.dp), tint = dailyCardTextColor)
+                            Box(contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(
+                                    progress = { 0f },
+                                    modifier = Modifier.size(40.dp),
+                                    color = dailyCardTextColor,
+                                    strokeWidth = 4.dp,
+                                    trackColor = dailyCardTextColor.copy(0.2f)
+                                )
+                                Text("0/3", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = dailyCardTextColor)
+                            }
+                        }
+                        Text(
+                            "Daily Challenge",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 12.dp),
+                            color = dailyCardTextColor
+                        )
+                        Text(
+                            "Today: System Design Basics",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = dailyCardTextColor.copy(alpha = 0.8f)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = onNavigateToCoding,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = accentButtonColor,
+                                contentColor = accentButtonTextColor
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Start Interview")
+                        }
+                    }
+                }
+            }
+
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(row1, row2).forEach { row ->
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            row.forEach { tab ->
+                                FilterChip(
+                                    modifier = Modifier.weight(1f).height(40.dp),
+                                    selected = selectedTab == tab,
+                                    onClick = { selectedTab = tab },
+                                    label = { Text(tab, fontSize = 11.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = accentButtonColor,
+                                        selectedLabelColor = accentButtonTextColor,
+                                        containerColor = searchContainerColor,
+                                        labelColor = primaryTextColor
+                                    ),
+                                    border = FilterChipDefaults.filterChipBorder(
+                                        enabled = true,
+                                        selected = selectedTab == tab,
+                                        borderColor = if (selectedTab == tab) accentButtonColor else Color.Transparent
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .heightIn(max = 56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = SearchBarDefaults.colors(
-                        containerColor = searchContainerColor,
-                        inputFieldColors = TextFieldDefaults.colors(
-                            focusedTextColor = primaryTextColor,
-                            unfocusedTextColor = primaryTextColor,
-                            cursorColor = primaryTextColor,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent
-                        )
+                        .height(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    val purpleAccent = if (isDark) Color(0xFF4A3457) else Color(0xFFE8B9FF)
+                    val orangeAccent = if (isDark) Color(0xFF5C3D1E) else Color(0xFFFFB366)
+
+                    SmallTaskCard(
+                        topic = cardData.first,
+                        color = purpleAccent,
+                        icon = Icons.Rounded.Psychology,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        onClick = onNavigateToQuestions
                     )
-                ) {}
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
-        ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = dailyCardColor),
-                shape = RoundedCornerShape(28.dp)
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Icon(Icons.Outlined.Terminal, null, modifier = Modifier.size(28.dp), tint = dailyCardTextColor)
-                        Box(contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
-                                progress = { 0f },
-                                modifier = Modifier.size(40.dp),
-                                color = dailyCardTextColor,
-                                strokeWidth = 4.dp,
-                                trackColor = dailyCardTextColor.copy(0.2f)
-                            )
-                            Text("0/3", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = dailyCardTextColor)
-                        }
-                    }
-                    Text(
-                        "Daily Challenge",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 12.dp),
-                        color = dailyCardTextColor
+                    SmallTaskCard(
+                        topic = cardData.second,
+                        color = orangeAccent,
+                        icon = Icons.Outlined.Code,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        onClick = onNavigateToCoding
                     )
-                    Text(
-                        "Today: System Design Basics",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = dailyCardTextColor.copy(alpha = 0.8f)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = onNavigateToCoding,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = accentButtonColor,
-                            contentColor = accentButtonTextColor
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Start Interview")
-                    }
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(row1, row2).forEach { row ->
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        row.forEach { tab ->
-                            FilterChip(
-                                modifier = Modifier.weight(1f).height(40.dp),
-                                selected = selectedTab == tab,
-                                onClick = { selectedTab = tab },
-                                label = { Text(tab, fontSize = 11.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = accentButtonColor,
-                                    selectedLabelColor = accentButtonTextColor,
-                                    containerColor = searchContainerColor,
-                                    labelColor = primaryTextColor
-                                ),
-                                border = FilterChipDefaults.filterChipBorder(
-                                    enabled = true,
-                                    selected = selectedTab == tab,
-                                    borderColor = if (selectedTab == tab) accentButtonColor else Color.Transparent
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                val purpleAccent = if (isDark) Color(0xFF4A3457) else Color(0xFFE8B9FF)
-                val orangeAccent = if (isDark) Color(0xFF5C3D1E) else Color(0xFFFFB366)
-
-                SmallTaskCard(
-                    topic = cardData.first,
-                    color = purpleAccent,
-                    icon = Icons.Rounded.Psychology,
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    onClick = onNavigateToQuestions
-                )
-                SmallTaskCard(
-                    topic = cardData.second,
-                    color = orangeAccent,
-                    icon = Icons.Outlined.Code,
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    onClick = onNavigateToCoding
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
