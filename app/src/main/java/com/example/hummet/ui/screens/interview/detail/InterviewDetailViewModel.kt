@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class InterviewDetailViewModel(
     private val repository: InterviewRepository,
-    private val topicId: Int
+    private val topicId: String
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<InterviewDetailState>(InterviewDetailState.Loading)

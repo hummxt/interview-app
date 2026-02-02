@@ -1,7 +1,7 @@
 package com.example.hummet.data.model
 
 data class InterviewTopic(
-    val id: Int,
+    val id: String,
     val title: String,
     val description: String,
     val difficulty: String,

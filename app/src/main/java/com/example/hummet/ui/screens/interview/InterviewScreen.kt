@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 data class InterviewTopic(
-    val id: Int,
+    val id: String,
     val title: String,
     val description: String,
     val difficulty: DifficultyLevel,
@@ -64,14 +64,14 @@ enum class Category(val label: String, val icon: ImageVector, val gradient: List
 }
 
 val sampleTopics = listOf(
-    InterviewTopic(1, "Object-Oriented Programming", "Core OOP concepts: encapsulation and inheritance.", DifficultyLevel.JUNIOR, Category.BACKEND, 24, "45 min"),
-    InterviewTopic(2, "Kotlin Coroutines", "Structured concurrency and Flow.", DifficultyLevel.MIDDLE, Category.MOBILE, 32, "60 min"),
-    InterviewTopic(3, "Jetpack Compose", "Modern declarative UI and State management.", DifficultyLevel.MIDDLE, Category.MOBILE, 28, "55 min"),
-    InterviewTopic(4, "Clean Architecture", "SOLID principles and layered architecture.", DifficultyLevel.SENIOR, Category.ARCHITECTURE, 20, "50 min"),
-    InterviewTopic(5, "REST API Design", "RESTful principles and best practices.", DifficultyLevel.MIDDLE, Category.BACKEND, 18, "40 min"),
-    InterviewTopic(6, "SQL & Database Design", "Queries, indexing, and normalization.", DifficultyLevel.JUNIOR, Category.DATABASE, 30, "50 min"),
-    InterviewTopic(7, "Docker & Containers", "Containerization and orchestration basics.", DifficultyLevel.MIDDLE, Category.DEVOPS, 22, "45 min"),
-    InterviewTopic(8, "Unit Testing", "TDD, mocking, and test strategies.", DifficultyLevel.JUNIOR, Category.TESTING, 26, "40 min")
+    InterviewTopic("1", "Object-Oriented Programming", "Core OOP concepts: encapsulation and inheritance.", DifficultyLevel.JUNIOR, Category.BACKEND, 24, "45 min"),
+    InterviewTopic("2", "Kotlin Coroutines", "Structured concurrency and Flow.", DifficultyLevel.MIDDLE, Category.MOBILE, 32, "60 min"),
+    InterviewTopic("3", "Jetpack Compose", "Modern declarative UI and State management.", DifficultyLevel.MIDDLE, Category.MOBILE, 28, "55 min"),
+    InterviewTopic("4", "Clean Architecture", "SOLID principles and layered architecture.", DifficultyLevel.SENIOR, Category.ARCHITECTURE, 20, "50 min"),
+    InterviewTopic("5", "REST API Design", "RESTful principles and best practices.", DifficultyLevel.MIDDLE, Category.BACKEND, 18, "40 min"),
+    InterviewTopic("6", "SQL & Database Design", "Queries, indexing, and normalization.", DifficultyLevel.JUNIOR, Category.DATABASE, 30, "50 min"),
+    InterviewTopic("7", "Docker & Containers", "Containerization and orchestration basics.", DifficultyLevel.MIDDLE, Category.DEVOPS, 22, "45 min"),
+    InterviewTopic("8", "Unit Testing", "TDD, mocking, and test strategies.", DifficultyLevel.JUNIOR, Category.TESTING, 26, "40 min")
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

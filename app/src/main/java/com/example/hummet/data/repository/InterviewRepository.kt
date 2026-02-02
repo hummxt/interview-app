@@ -8,7 +8,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
 
     private val fakeTopics = listOf(
         InterviewTopic(
-            id = 1,
+            id = "1",
             title = "Object-Oriented Programming",
             description = "Core OOP concepts: encapsulation and inheritance.",
             difficulty = "Junior",
@@ -24,7 +24,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
             prerequisites = listOf("Basic programming knowledge", "Understanding of classes")
         ),
         InterviewTopic(
-            id = 2,
+            id = "2",
             title = "Kotlin Coroutines",
             description = "Structured concurrency and Flow.",
             difficulty = "Middle",
@@ -40,7 +40,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
             prerequisites = listOf("Kotlin basics", "Understanding of threads")
         ),
         InterviewTopic(
-            id = 3,
+            id = "3",
             title = "Jetpack Compose",
             description = "Modern declarative UI and State management.",
             difficulty = "Middle",
@@ -56,7 +56,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
             prerequisites = listOf("Android basics", "Kotlin knowledge")
         ),
         InterviewTopic(
-            id = 4,
+            id = "4",
             title = "Clean Architecture",
             description = "SOLID principles and layered architecture.",
             difficulty = "Senior",
@@ -74,7 +74,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
     )
 
     private val fakeTopicDetails = mapOf(
-        1 to TopicDetail(
+        "1" to TopicDetail(
             topic = fakeTopics[0],
             sampleQuestions = listOf(
                 "What is encapsulation and why is it important?",
@@ -90,7 +90,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
             ),
             completionRate = 0.65f
         ),
-        2 to TopicDetail(
+        "2" to TopicDetail(
             topic = fakeTopics[1],
             sampleQuestions = listOf(
                 "What is the difference between launch and async?",
@@ -106,7 +106,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
             ),
             completionRate = 0.40f
         ),
-        3 to TopicDetail(
+        "3" to TopicDetail(
             topic = fakeTopics[2],
             sampleQuestions = listOf(
                 "What is recomposition in Compose?",
@@ -122,7 +122,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
             ),
             completionRate = 0.55f
         ),
-        4 to TopicDetail(
+        "4" to TopicDetail(
             topic = fakeTopics[3],
             sampleQuestions = listOf(
                 "Explain the SOLID principles",
@@ -149,7 +149,7 @@ class InterviewRepository(private val apiService: InterviewApiService) {
         }
     }
 
-    suspend fun getTopicDetail(topicId: Int): Result<TopicDetail> {
+    suspend fun getTopicDetail(topicId: String): Result<TopicDetail> {
         return try {
             val detail = apiService.getTopicDetail(topicId)
             Result.success(detail)

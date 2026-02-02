@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 data class TopicGroup(
-    val id: Int,
+    val id: String,
     val topicTitle: String,
     val category: String,
     val difficulty: String,
@@ -36,19 +36,19 @@ data class TopicGroup(
 )
 
 val topicData = listOf(
-    TopicGroup(1, "React State Management", "Frontend", "Medium",
+    TopicGroup("1", "React State Management", "Frontend", "Medium",
         listOf("What is the difference between useState and useReducer?", "When should you use Context API over Redux?", "How do you lift state up in React?", "What are the limitations of local state?"),
         Color(0xFFE8B9FF)),
-    TopicGroup(2, "Kotlin Coroutines", "Languages", "Hard",
+    TopicGroup("2", "Kotlin Coroutines", "Languages", "Hard",
         listOf("What is a CoroutineScope?", "Explain the difference between Launch and Async", "How does 'suspend' work under the hood?", "What is a Dispatcher?"),
         Color(0xFFFFB366)),
-    TopicGroup(3, "SQL Indexing", "Databases", "Medium",
+    TopicGroup("3", "SQL Indexing", "Databases", "Medium",
         listOf("What is a B-Tree index?", "Difference between Clustered and Non-Clustered indexes?", "When does an index slow down performance?", "How to use EXPLAIN to optimize queries?"),
         Color(0xFFA2D2FF)),
-    TopicGroup(4, "Node.js Event Loop", "Backend", "Hard",
+    TopicGroup("4", "Node.js Event Loop", "Backend", "Hard",
         listOf("Explain the phases of the Event Loop", "What is setImmediate vs process.nextTick?", "How does Node handle non-blocking I/O?", "What is the role of Libuv?"),
         Color(0xFFB9FBC0)),
-    TopicGroup(5, "Swift UI Basics", "Mobile", "Easy",
+    TopicGroup("5", "Swift UI Basics", "Mobile", "Easy",
         listOf("What is a View in SwiftUI?", "How do @State and @Binding differ?", "Explain the Body property", "How to create a List in SwiftUI?"),
         Color(0xFFFFCFD2))
 )
@@ -134,7 +134,6 @@ fun QuestionsScreen(navController: NavController) {
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                    // Company Filters
                     Column {
                         Text(
                             "Company",
@@ -166,7 +165,6 @@ fun QuestionsScreen(navController: NavController) {
                         }
                     }
 
-                    // Topic Tags
                     Column {
                         Text(
                             "Tags",
@@ -195,7 +193,6 @@ fun QuestionsScreen(navController: NavController) {
                         }
                     }
 
-                    // Difficulty
                     Column {
                         Text(
                             "Difficulty",

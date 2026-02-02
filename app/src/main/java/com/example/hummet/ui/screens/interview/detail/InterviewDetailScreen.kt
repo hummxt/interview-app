@@ -30,7 +30,7 @@ import com.example.hummet.data.model.TopicDetail
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InterviewDetailScreen(
-    topicId: Int,
+    topicId: String,
     onBackClick: () -> Unit,
     onStartInterview: () -> Unit,
     viewModel: InterviewDetailViewModel

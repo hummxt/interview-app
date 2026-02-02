@@ -16,6 +16,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.hummet.R
+import androidx.compose.runtime.*
+import com.example.hummet.data.repository.UserRepository
+import com.example.hummet.data.repository.UserData
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,6 +27,19 @@ fun ProfileSection(
     primaryTextColor: Color,
     secondaryTextColor: Color
 ) {
+    val repository = remember { UserRepository() }
+    val auth = remember { FirebaseAuth.getInstance() }
+    var userData by remember { mutableStateOf<UserData?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        userData = repository.getUserProfile()
+        isLoading = false
+    }
+
+    val displayName = userData?.name ?: auth.currentUser?.displayName ?: "Hummet User"
+    val experienceLevel = userData?.experienceLevel ?: "Beginner"
+
     CenterAlignedTopAppBar(
         title = {
             Row(
@@ -41,13 +58,13 @@ fun ProfileSection(
                 )
                 Column(modifier = Modifier.padding(start = 12.dp)) {
                     Text(
-                        "Hello, Hummet",
+                        "Hello, $displayName",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = primaryTextColor
                     )
                     Text(
-                        "Beginner",
+                        experienceLevel,
                         style = MaterialTheme.typography.labelSmall,
                         color = secondaryTextColor
                     )

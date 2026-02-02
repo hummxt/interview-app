@@ -18,10 +18,17 @@ import com.example.hummet.ui.screens.quiz.QuestionsScreen
 import com.example.hummet.ui.screens.interview.InterviewScreen
 import com.example.hummet.ui.screens.profile.ProfileScreen
 import com.example.hummet.ui.screens.settings.SettingsScreen
+import com.example.hummet.ui.screens.auth.LoginScreen
+import com.example.hummet.ui.screens.auth.RegisterScreen
+import com.example.hummet.ui.screens.auth.OnboardingScreen
 import com.example.hummet.ui.theme.HummetTheme
 import com.example.hummet.ui.theme.ThemeConfig
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,9 +36,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val systemInDarkTheme = isSystemInDarkTheme()
+            val auth = remember { FirebaseAuth.getInstance() }
+            var isLoggedIn by remember { mutableStateOf(auth.currentUser != null) }
+
             LaunchedEffect(Unit) {
-                // Initialize theme only if it's the first run or follow system
                 ThemeConfig.isDarkMode = systemInDarkTheme
+                
+                auth.addAuthStateListener { firebaseAuth ->
+                    isLoggedIn = firebaseAuth.currentUser != null
+                }
             }
 
             HummetTheme {
@@ -43,16 +56,47 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         val showBottomBar = currentRoute in listOf("home", "questions", "interview", "profile")
-                        if (showBottomBar) {
+                        if (showBottomBar && isLoggedIn) {
                             BottomBar(navController = navController)
                         }
                     }
                 ) { innerPadding: PaddingValues ->
                     NavHost(
                         navController = navController,
-                        startDestination = "home",
+                        startDestination = if (isLoggedIn) "home" else "login",
                         modifier = Modifier.padding(innerPadding)
                     ) {
+                        composable("login") {
+                            LoginScreen(
+                                onNavigateToRegister = { navController.navigate("register") },
+                                onLoginSuccess = { 
+                                    isLoggedIn = true
+                                    navController.navigate("home") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                        composable("register") {
+                            RegisterScreen(
+                                onNavigateToLogin = { navController.popBackStack() },
+                                onRegisterSuccess = {
+                                    isLoggedIn = true
+                                    navController.navigate("onboarding") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                        composable("onboarding") {
+                            OnboardingScreen(
+                                onComplete = {
+                                    navController.navigate("home") {
+                                        popUpTo("onboarding") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
                         composable("home") {
                             Homepage(
                                 onNavigateToInterview = { navController.navigate("interview") },

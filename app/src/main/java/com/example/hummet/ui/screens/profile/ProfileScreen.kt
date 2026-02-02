@@ -34,10 +34,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hummet.R
+import com.example.hummet.data.repository.UserData
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfileScreen(onNavigateToSettings: () -> Unit) {
+    val repository = remember { com.example.hummet.data.repository.UserRepository() }
+    val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+    
+    var userData by remember { mutableStateOf<UserData?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        userData = repository.getUserProfile()
+        isLoading = false
+    }
+
     val isDark = isAppInDarkTheme()
     val primaryTextColor = if (isDark) Color.White else Color.Black
     val secondaryTextColor = if (isDark) Color.LightGray else Color.Gray
@@ -45,18 +62,28 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
     val borderColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)
     val accentColor = if (isDark) Color.White else Color.Black
     
+    val displayName = userData?.name ?: auth.currentUser?.displayName ?: "Hummet User"
+    val userRole = userData?.role ?: "Fullstack Developer"
+    val userGoal = userData?.goal ?: "Aiming for Mid-level Backend at Hummet MMC"
+    val readyMeterProgress = (userData?.readyMeter ?: 0) / 100f
+    val readyMeterText = "${(readyMeterProgress * 100).toInt()}%"
+    
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface
     ) { padding: PaddingValues ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                top = padding.calculateTopPadding() + 16.dp,
-                bottom = padding.calculateBottomPadding() + 24.dp
-            ),
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    top = padding.calculateTopPadding() + 16.dp,
+                    bottom = padding.calculateBottomPadding() + 24.dp
+                ),
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            // Header Row (Title & Settings) - Now part of scrollable content
             item {
                 Row(
                     modifier = Modifier
@@ -82,7 +109,6 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                 }
             }
 
-            // 1. Header (Who am I?)
             item {
                 Column(
                     modifier = Modifier.padding(horizontal = 24.dp),
@@ -108,13 +134,13 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     Text(
-                        "Hummet User",
+                        displayName,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.ExtraBold,
                         color = primaryTextColor
                     )
                     Text(
-                        "Fullstack Developer",
+                        userRole,
                         style = MaterialTheme.typography.bodyMedium,
                         color = secondaryTextColor
                     )
@@ -133,7 +159,7 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                         ) {
                             Icon(Icons.Outlined.Flag, null, modifier = Modifier.size(14.dp), tint = secondaryTextColor)
                             Text(
-                                "Aiming for Mid-level Backend at Stripe",
+                                userGoal,
                                 style = MaterialTheme.typography.labelMedium,
                                 color = primaryTextColor
                             )
@@ -142,7 +168,6 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Ready Meter
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.Start,
@@ -160,14 +185,14 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                                 color = primaryTextColor
                             )
                             Text(
-                                "68%",
+                                readyMeterText,
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = primaryTextColor
                             )
                         }
                         LinearProgressIndicator(
-                            progress = 0.68f,
+                            progress = { readyMeterProgress },
                             modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(8.dp)),
                             color = accentColor,
                             trackColor = borderColor
@@ -176,7 +201,6 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                 }
             }
 
-            // 2. The Skills (What do I know?)
             item {
                 Column(
                     modifier = Modifier.padding(horizontal = 24.dp),
@@ -238,7 +262,6 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                 }
             }
 
-            // 3. The Progress (How am I doing?)
             item {
                 Column(
                     modifier = Modifier.padding(horizontal = 24.dp),
@@ -251,7 +274,6 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                         color = primaryTextColor
                     )
                     
-                    // Simple grid for heatmap
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -260,10 +282,10 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        repeat(7) { // 7 days of the week
+                        repeat(7) {
                             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                repeat(20) { // last 20 columns
-                                    val randomVal = (0..4).random()
+                                repeat(20) {
+                                    val randomVal = 0
                                     Box(
                                         modifier = Modifier
                                             .size(10.dp)
@@ -282,14 +304,13 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                             }
                         }
                         Text(
-                            "458 contributions in the last year",
+                            "0 contributions in the last year",
                             style = MaterialTheme.typography.labelSmall,
                             color = secondaryTextColor,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
 
-                    // Stats Boxes
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -297,7 +318,7 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             StatCard(
                                 label = "Solved",
-                                value = "45/100",
+                                value = "0/100",
                                 icon = Icons.Outlined.CheckCircle,
                                 containerColor = containerColor,
                                 borderColor = borderColor,
@@ -305,7 +326,7 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                             )
                             StatCard(
                                 label = "Avg. Score",
-                                value = "82%",
+                                value = "0%",
                                 icon = Icons.Outlined.ShowChart,
                                 containerColor = containerColor,
                                 borderColor = borderColor,
@@ -315,7 +336,7 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             StatCard(
                                 label = "Mocks",
-                                value = "8",
+                                value = "0",
                                 icon = Icons.Outlined.SupportAgent,
                                 containerColor = containerColor,
                                 borderColor = borderColor,
@@ -323,7 +344,7 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
                             )
                             StatCard(
                                 label = "Streak",
-                                value = "12 Days",
+                                value = "0 Days",
                                 icon = Icons.Outlined.Bolt,
                                 containerColor = containerColor,
                                 borderColor = borderColor,
@@ -335,6 +356,7 @@ fun ProfileScreen(onNavigateToSettings: () -> Unit) {
             }
         }
     }
+}
 }
 
 @Composable

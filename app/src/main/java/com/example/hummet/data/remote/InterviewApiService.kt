@@ -11,8 +11,8 @@ interface InterviewApiService {
     suspend fun getTopics(): List<InterviewTopic>
 
     @GET("api/topics/{id}")
-    suspend fun getTopicDetail(@Path("id") topicId: Int): TopicDetail
+    suspend fun getTopicDetail(@Path("id") topicId: String): TopicDetail
 
     @GET("api/topics/{id}/questions")
-    suspend fun getTopicQuestions(@Path("id") topicId: Int): List<String>
+    suspend fun getTopicQuestions(@Path("id") topicId: String): List<String>
 }
