@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -17,18 +18,18 @@ data class ScreenRoute(val route: String, val label: String, val icon: ImageVect
 
 object NavigationRoutes {
     val Home = ScreenRoute("home", "Home", Icons.Default.Home)
-    val Quiz = ScreenRoute("quiz", "Quiz", Icons.Default.QuestionAnswer)
+    val Questions = ScreenRoute("questions", "Questions", Icons.Default.QuestionAnswer)
     val Interview = ScreenRoute("interview", "Interview", Icons.Outlined.People)
-    val Coding = ScreenRoute("coding", "Coding", Icons.Default.Code)
+    val Profile = ScreenRoute("profile", "Profile", Icons.Outlined.Person)
 }
 
 @Composable
 fun BottomBar(navController: NavController) {
     val items = listOf(
         NavigationRoutes.Home,
-        NavigationRoutes.Quiz,
+        NavigationRoutes.Questions,
         NavigationRoutes.Interview,
-        NavigationRoutes.Coding
+        NavigationRoutes.Profile,
     )
 
     NavigationBar {

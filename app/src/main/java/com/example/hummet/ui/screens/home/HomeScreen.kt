@@ -1,10 +1,12 @@
 package com.example.hummet.ui.screens.home
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import com.example.hummet.ui.theme.isAppInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Terminal
@@ -28,13 +30,13 @@ data class InterviewTopic(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Homepage(
-    onNavigateToCoding: () -> Unit,
+    onNavigateToInterview: () -> Unit,
     onNavigateToQuestions: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("Languages") }
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppInDarkTheme()
 
     val primaryTextColor = if (isDark) Color.White else Color.Black
     val secondaryTextColor = if (isDark) Color.LightGray else Color.Gray
@@ -80,15 +82,15 @@ fun Homepage(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface
-    ) { innerPadding ->
+    ) { innerPadding: PaddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
             contentPadding = PaddingValues(
                 top = innerPadding.calculateTopPadding(),
-                bottom = innerPadding.calculateBottomPadding() + 16.dp
+                bottom = innerPadding.calculateBottomPadding() + 24.dp
             ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
                 Column(
@@ -100,31 +102,33 @@ fun Homepage(
                         primaryTextColor = primaryTextColor,
                         secondaryTextColor = secondaryTextColor
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    SearchBar(
-                        query = searchQuery,
-                        onQueryChange = { searchQuery = it },
-                        onSearch = { isSearchActive = false },
-                        active = isSearchActive,
-                        onActiveChange = { isSearchActive = it },
-                        placeholder = { Text("Search interview topics...", fontSize = 14.sp, color = secondaryTextColor) },
-                        leadingIcon = { Icon(Icons.Default.Search, null, modifier = Modifier.size(20.dp), tint = primaryTextColor) },
+                    Spacer(modifier = Modifier.height(24.dp))
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .heightIn(max = 56.dp),
+                            .padding(horizontal = 24.dp),
+                        placeholder = { Text("Search interview topics...", color = secondaryTextColor, fontSize = 14.sp) },
+                        leadingIcon = { Icon(Icons.Default.Search, null, tint = primaryTextColor, modifier = Modifier.size(20.dp)) },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Default.Close, null, tint = secondaryTextColor, modifier = Modifier.size(18.dp))
+                                }
+                            }
+                        },
                         shape = RoundedCornerShape(16.dp),
-                        colors = SearchBarDefaults.colors(
-                            containerColor = searchContainerColor,
-                            inputFieldColors = TextFieldDefaults.colors(
-                                focusedTextColor = primaryTextColor,
-                                unfocusedTextColor = primaryTextColor,
-                                cursorColor = primaryTextColor,
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent
-                            )
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = searchContainerColor,
+                            unfocusedContainerColor = searchContainerColor,
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedTextColor = primaryTextColor,
+                            unfocusedTextColor = primaryTextColor
                         )
-                    ) {}
+                    )
                 }
             }
 
@@ -132,11 +136,11 @@ fun Homepage(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 24.dp),
                     colors = CardDefaults.cardColors(containerColor = dailyCardColor),
-                    shape = RoundedCornerShape(28.dp)
+                    shape = RoundedCornerShape(32.dp)
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
+                    Column(modifier = Modifier.padding(24.dp)) {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Icon(Icons.Outlined.Terminal, null, modifier = Modifier.size(28.dp), tint = dailyCardTextColor)
                             Box(contentAlignment = Alignment.Center) {
@@ -164,7 +168,7 @@ fun Homepage(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
-                            onClick = onNavigateToCoding,
+                            onClick = onNavigateToInterview,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = accentButtonColor,
                                 contentColor = accentButtonTextColor
@@ -179,11 +183,11 @@ fun Homepage(
 
             item {
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     listOf(row1, row2).forEach { row ->
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             row.forEach { tab ->
                                 FilterChip(
                                     modifier = Modifier.weight(1f).height(40.dp),
@@ -213,26 +217,26 @@ fun Homepage(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 24.dp)
                         .height(IntrinsicSize.Max),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     val purpleAccent = if (isDark) Color(0xFF4A3457) else Color(0xFFE8B9FF)
                     val orangeAccent = if (isDark) Color(0xFF5C3D1E) else Color(0xFFFFB366)
 
                     SmallTaskCard(
                         topic = cardData.first,
-                        color = purpleAccent,
                         icon = Icons.Rounded.Psychology,
+                        accentColor = purpleAccent,
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         onClick = onNavigateToQuestions
                     )
                     SmallTaskCard(
                         topic = cardData.second,
-                        color = orangeAccent,
                         icon = Icons.Outlined.Code,
+                        accentColor = orangeAccent,
                         modifier = Modifier.weight(1f).fillMaxHeight(),
-                        onClick = onNavigateToCoding
+                        onClick = onNavigateToQuestions
                     )
                 }
             }
@@ -243,27 +247,30 @@ fun Homepage(
 @Composable
 fun SmallTaskCard(
     topic: InterviewTopic,
-    color: Color,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
+    accentColor: Color,
     modifier: Modifier,
     onClick: () -> Unit
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppInDarkTheme()
     val contentColor = if (isDark) Color.White else Color.Black
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)
 
     Card(
         onClick = onClick,
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = color),
-        shape = RoundedCornerShape(24.dp)
+        colors = CardDefaults.cardColors(containerColor = accentColor),
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Icon(icon, null, modifier = Modifier.size(26.dp), tint = contentColor)
             Column {
                 Text(topic.title, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleMedium, lineHeight = 18.sp, color = contentColor)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(topic.description, style = MaterialTheme.typography.bodySmall, color = contentColor.copy(0.8f), lineHeight = 14.sp)
+                Text(topic.description, style = MaterialTheme.typography.bodySmall, color = contentColor.copy(0.7f), lineHeight = 14.sp)
             }
         }
     }
 }
+

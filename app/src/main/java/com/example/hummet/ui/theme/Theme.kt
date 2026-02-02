@@ -6,6 +6,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
@@ -28,9 +31,16 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = Color(0xFF49454F)
 )
 
+object ThemeConfig {
+    var isDarkMode by mutableStateOf(false)
+}
+
+@Composable
+fun isAppInDarkTheme(): Boolean = ThemeConfig.isDarkMode
+
 @Composable
 fun HummetTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isAppInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme

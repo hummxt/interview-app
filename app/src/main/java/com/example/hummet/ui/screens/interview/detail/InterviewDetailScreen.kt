@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
+import com.example.hummet.ui.theme.isAppInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,7 +37,7 @@ fun InterviewDetailScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppInDarkTheme()
     val primaryTextColor = if (isDark) Color.White else Color.Black
     val secondaryTextColor = if (isDark) Color.LightGray else Color.Gray
     val containerColor = if (isDark) Color(0xFF1E1E1E) else Color(0xFFF0F0F0)

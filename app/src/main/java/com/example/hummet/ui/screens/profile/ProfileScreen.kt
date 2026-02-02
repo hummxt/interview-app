@@ -1,111 +1,336 @@
-package com.example.hummet.ui.screens
+package com.example.hummet.ui.screens.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.example.hummet.ui.theme.isAppInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Headset
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hummet.R
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(onNavigateToSettings: () -> Unit) {
+    val isDark = isAppInDarkTheme()
+    val primaryTextColor = if (isDark) Color.White else Color.Black
+    val secondaryTextColor = if (isDark) Color.LightGray else Color.Gray
+    val containerColor = if (isDark) Color(0xFF1E1E1E) else Color.White
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)
+    val accentColor = if (isDark) Color.White else Color.Black
+    
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Profile", fontWeight = FontWeight.Black) },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit Profile")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+        containerColor = MaterialTheme.colorScheme.surface
+    ) { padding: PaddingValues ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                top = padding.calculateTopPadding() + 16.dp,
+                bottom = padding.calculateBottomPadding() + 24.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.Person,
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Hummet",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Member",
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-
+            // Header Row (Title & Settings) - Now part of scrollable content
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    InfoStatCard("Level", "24", Icons.Default.TrendingUp)
-                    InfoStatCard("Badges", "12", Icons.Default.Stars)
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                    Text(
+                        "Profile",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryTextColor
                     )
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        ProfileDetailItem("Member Since", "October 2023", Icons.Default.CalendarToday)
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
-                        ProfileDetailItem("Email", "alex.hummet@example.com", Icons.Default.Email)
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
-                        ProfileDetailItem("Location", "Baku, Azerbaijan", Icons.Default.LocationOn)
+                    IconButton(
+                        onClick = onNavigateToSettings,
+                        modifier = Modifier
+                            .background(borderColor, CircleShape)
+                            .size(40.dp)
+                    ) {
+                        Icon(Icons.Default.Settings, null, tint = primaryTextColor, modifier = Modifier.size(20.dp))
                     }
                 }
             }
 
+            // 1. Header (Who am I?)
             item {
-                Spacer(modifier = Modifier.height(40.dp))
-                Button(
-                    onClick = { /* Logout Logic */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Log Out")
+                    Box(contentAlignment = Alignment.BottomEnd) {
+                        Image(
+                            painter = painterResource(id = R.drawable.profile),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, accentColor, CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                        Surface(
+                            color = Color(0xFF10B981),
+                            shape = CircleShape,
+                            modifier = Modifier.size(24.dp).border(2.dp, containerColor, CircleShape)
+                        ) {}
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text(
+                        "Hummet User",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = primaryTextColor
+                    )
+                    Text(
+                        "Fullstack Developer",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = secondaryTextColor
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Surface(
+                        color = containerColor,
+                        shape = RoundedCornerShape(12.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(Icons.Outlined.Flag, null, modifier = Modifier.size(14.dp), tint = secondaryTextColor)
+                            Text(
+                                "Aiming for Mid-level Backend at Stripe",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = primaryTextColor
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Ready Meter
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.Bottom
+                        ) {
+                            Text(
+                                "Ready Meter",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = primaryTextColor
+                            )
+                            Text(
+                                "68%",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = primaryTextColor
+                            )
+                        }
+                        LinearProgressIndicator(
+                            progress = 0.68f,
+                            modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(8.dp)),
+                            color = accentColor,
+                            trackColor = borderColor
+                        )
+                    }
+                }
+            }
+
+            // 2. The Skills (What do I know?)
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        "Skills & Strengths",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryTextColor
+                    )
+                    
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf("Javascript", "Python", "SQL", "Kotlin", "React", "Docker").forEach { skill ->
+                            Surface(
+                                color = containerColor,
+                                shape = RoundedCornerShape(10.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+                            ) {
+                                Text(
+                                    skill,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = primaryTextColor
+                                )
+                            }
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = if(isDark) Color(0xFF2D1B47) else Color(0xFFE8B9FF).copy(alpha = 0.2f)),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, if(isDark) Color(0xFFE8B9FF).copy(0.2f) else Color(0xFFE8B9FF))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(if(isDark) Color(0xFFE8B9FF).copy(0.2f) else Color(0xFFE8B9FF), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.AutoAwesome, null, tint = if(isDark) Color(0xFFE8B9FF) else Color(0xFF4A3457))
+                            }
+                            Column {
+                                Text("Top Strength", style = MaterialTheme.typography.labelSmall, color = if(isDark) Color(0xFFE8B9FF).copy(0.7f) else Color(0xFF4A3457).copy(0.7f))
+                                Text("Logic King", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = if(isDark) Color(0xFFE8B9FF) else Color(0xFF4A3457))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 3. The Progress (How am I doing?)
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        "Activity Heatmap",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryTextColor
+                    )
+                    
+                    // Simple grid for heatmap
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(containerColor, RoundedCornerShape(16.dp))
+                            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        repeat(7) { // 7 days of the week
+                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                repeat(20) { // last 20 columns
+                                    val randomVal = (0..4).random()
+                                    Box(
+                                        modifier = Modifier
+                                            .size(10.dp)
+                                            .clip(RoundedCornerShape(2.dp))
+                                            .background(
+                                                when(randomVal) {
+                                                    0 -> borderColor
+                                                    1 -> Color(0xFF10B981).copy(0.2f)
+                                                    2 -> Color(0xFF10B981).copy(0.5f)
+                                                    3 -> Color(0xFF10B981).copy(0.8f)
+                                                    else -> Color(0xFF10B981)
+                                                }
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                        Text(
+                            "458 contributions in the last year",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = secondaryTextColor,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+
+                    // Stats Boxes
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            StatCard(
+                                label = "Solved",
+                                value = "45/100",
+                                icon = Icons.Outlined.CheckCircle,
+                                containerColor = containerColor,
+                                borderColor = borderColor,
+                                textColor = primaryTextColor
+                            )
+                            StatCard(
+                                label = "Avg. Score",
+                                value = "82%",
+                                icon = Icons.Outlined.ShowChart,
+                                containerColor = containerColor,
+                                borderColor = borderColor,
+                                textColor = primaryTextColor
+                            )
+                        }
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            StatCard(
+                                label = "Mocks",
+                                value = "8",
+                                icon = Icons.Outlined.SupportAgent,
+                                containerColor = containerColor,
+                                borderColor = borderColor,
+                                textColor = primaryTextColor
+                            )
+                            StatCard(
+                                label = "Streak",
+                                value = "12 Days",
+                                icon = Icons.Outlined.Bolt,
+                                containerColor = containerColor,
+                                borderColor = borderColor,
+                                textColor = primaryTextColor
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -113,25 +338,24 @@ fun ProfileScreen() {
 }
 
 @Composable
-fun InfoStatCard(label: String, value: String, icon: ImageVector) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        Text(text = value, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-        Text(text = label, fontSize = 12.sp, color = Color.Gray)
-    }
-}
-
-@Composable
-fun ProfileDetailItem(label: String, value: String, icon: ImageVector) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+fun StatCard(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    containerColor: Color,
+    borderColor: Color,
+    textColor: Color
+) {
+    Surface(
+        color = containerColor,
+        shape = RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = Color.Gray)
-        Spacer(modifier = Modifier.width(12.dp))
-        Column {
-            Text(text = label, fontSize = 12.sp, color = Color.Gray)
-            Text(text = value, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Icon(icon, null, modifier = Modifier.size(18.dp), tint = textColor.copy(0.6f))
+            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold, color = textColor)
+            Text(label, style = MaterialTheme.typography.labelSmall, color = textColor.copy(0.6f))
         }
     }
 }

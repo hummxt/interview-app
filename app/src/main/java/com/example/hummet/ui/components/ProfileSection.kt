@@ -28,7 +28,7 @@ fun ProfileSection(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp),
+                    .padding(start = 24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(

@@ -4,10 +4,9 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import com.example.hummet.ui.theme.isAppInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -83,7 +82,7 @@ fun InterviewScreen() {
     var selectedDifficulty by remember { mutableStateOf<DifficultyLevel?>(null) }
     var showStats by remember { mutableStateOf(false) }
 
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppInDarkTheme()
     val primaryTextColor = if (isDark) Color.White else Color.Black
     val secondaryTextColor = if (isDark) Color.LightGray else Color.Gray
     val accentButtonColor = if (isDark) Color.White else Color.Black
@@ -105,16 +104,16 @@ fun InterviewScreen() {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface
-    ) { padding ->
+    ) { padding: PaddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 24.dp),
             contentPadding = PaddingValues(
-                top = padding.calculateTopPadding() + 16.dp,
+                top = padding.calculateTopPadding() + 24.dp,
                 bottom = padding.calculateBottomPadding() + 24.dp
             ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
                 Row(
@@ -163,7 +162,7 @@ fun InterviewScreen() {
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     StreakCard(
                         modifier = Modifier.weight(1f),
@@ -276,9 +275,9 @@ fun StatsGrid(primaryTextColor: Color, secondaryTextColor: Color, containerColor
         StatItem("Current Streak", "0 days", Icons.Outlined.LocalFireDepartment, Color(0xFFEF4444))
     )
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         stats.chunked(2).forEach { rowStats ->
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 rowStats.forEach { stat ->
                     Card(
                         modifier = Modifier.weight(1f),
@@ -312,7 +311,7 @@ fun StatsGrid(primaryTextColor: Color, secondaryTextColor: Color, containerColor
 fun ProgressOverviewCard(dailyCardColor: Color, dailyCardTextColor: Color, accentButtonColor: Color, accentButtonTextColor: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(containerColor = dailyCardColor)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
@@ -362,7 +361,7 @@ fun StreakCard(modifier: Modifier = Modifier, cardColor: Color, textColor: Color
     Card(modifier = modifier, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = cardColor)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Outlined.LocalFireDepartment, null, tint = textColor, modifier = Modifier.size(24.dp))
-            Text("7 Days", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = textColor)
+            Text("0 Days", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = textColor)
             Text("Current Streak", fontSize = 12.sp, color = textColor.copy(alpha = 0.8f))
         }
     }
@@ -373,7 +372,7 @@ fun AchievementCard(modifier: Modifier = Modifier, cardColor: Color, textColor: 
     Card(modifier = modifier, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = cardColor)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Outlined.EmojiEvents, null, tint = textColor, modifier = Modifier.size(24.dp))
-            Text("12 / 50", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = textColor)
+            Text("0 / 50", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = textColor)
             Text("Topics Mastered", fontSize = 12.sp, color = textColor.copy(alpha = 0.8f))
         }
     }
@@ -430,26 +429,78 @@ fun DifficultyFilterRow(selectedDifficulty: DifficultyLevel?, accentColor: Color
 }
 
 @Composable
-fun TopicCard(topic: InterviewTopic, primaryTextColor: Color, secondaryTextColor: Color, containerColor: Color, onClick: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = containerColor)) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(44.dp).background(Brush.linearGradient(topic.category.gradient), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-                        Icon(topic.category.icon, null, tint = Color.White, modifier = Modifier.size(22.dp))
+fun TopicCard(
+    topic: InterviewTopic,
+    primaryTextColor: Color,
+    secondaryTextColor: Color,
+    containerColor: Color,
+    onClick: () -> Unit
+) {
+    val isDark = isAppInDarkTheme()
+    val bgColor = if (isDark) Color(0xFF1E1E1E) else Color.White
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = bgColor),
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        color = topic.difficulty.color.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = topic.difficulty.label,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = topic.difficulty.color
+                        )
                     }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(topic.title, fontWeight = FontWeight.Bold, color = primaryTextColor, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text("${topic.questionsCount} Questions • ${topic.estimatedTime}", style = MaterialTheme.typography.bodySmall, color = secondaryTextColor)
-                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = topic.category.label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = secondaryTextColor,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
-                Box(modifier = Modifier.size(28.dp).background(topic.difficulty.color.copy(0.15f), CircleShape), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.size(10.dp).background(topic.difficulty.color, CircleShape))
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = topic.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = primaryTextColor
+                )
+                Text(
+                    text = "${topic.questionsCount} Questions • ${topic.estimatedTime}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = secondaryTextColor
+                )
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(topic.description, color = secondaryTextColor, fontSize = 14.sp, maxLines = 2, lineHeight = 20.sp)
+            
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(borderColor, RoundedCornerShape(10.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = primaryTextColor,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }
